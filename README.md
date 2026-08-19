@@ -45,11 +45,22 @@ chmod +x build.sh
 ./build.sh
 ```
 
-Or push to GitHub — **Actions → Build APK** produces `FNF-Porter-For-Mobile.apk`.
+Or push to GitHub — **Actions → Build & Release** builds `FNF-Porter-For-Mobile.apk` and the **Releaser** job publishes it.
 
-Tag a release to attach the APK automatically:
+### Releaser
+
+Every push to `main` / `master` (and every `v*` tag) creates or updates a GitHub Release and attaches the APK. Pull requests only upload an artifact.
+
+| Trigger | Tag | Result |
+|---|---|---|
+| Push to `main` | `v` + `versionName` from the app (`v1.0.0`) | Create or update that Release |
+| Push tag `v1.2.0` | `v1.2.0` | Release that tag |
+| **Actions → Run workflow** | optional input, else app `versionName` | Manual Release |
+
+Bump `android:versionName` in `app/src/main/AndroidManifest.xml` when you want a new tag (e.g. `1.0.1` → `v1.0.1`). Same version on a later push **updates** the existing Release (APK replaced).
 
 ```bash
+# optional: pin a tag yourself
 git tag v1.0.0
 git push origin v1.0.0
 ```

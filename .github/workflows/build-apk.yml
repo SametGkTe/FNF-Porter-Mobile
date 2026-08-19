@@ -1,4 +1,4 @@
-name: Build APK
+name: Build & Release
 
 on:
   push:
@@ -6,16 +6,60 @@ on:
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag (e.g. v1.0.1). Empty = versionName from the app."
+        required: false
+        type: string
+      prerelease:
+        description: "Mark this GitHub Release as a pre-release"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: write
 
 jobs:
   build:
+    name: Build APK
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      version_code: ${{ steps.meta.outputs.version_code }}
+      tag: ${{ steps.meta.outputs.tag }}
+      apk_name: ${{ steps.meta.outputs.apk_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Read app version
+        id: meta
+        run: |
+          set -euo pipefail
+          VER=$(grep -oP 'android:versionName="\K[^"]+' app/src/main/AndroidManifest.xml)
+          CODE=$(grep -oP 'android:versionCode="\K[^"]+' app/src/main/AndroidManifest.xml)
+          INPUT="${{ github.event.inputs.version || '' }}"
+          if [ -n "$INPUT" ]; then
+            TAG="${INPUT#v}"
+            TAG="v${TAG}"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="v${VER}"
+          fi
+          APK_NAME="FNF-Porter-For-Mobile-${TAG}.apk"
+          {
+            echo "version=${VER}"
+            echo "version_code=${CODE}"
+            echo "tag=${TAG}"
+            echo "apk_name=${APK_NAME}"
+          } >> "$GITHUB_OUTPUT"
+          echo "App ${VER} (${CODE}) → release ${TAG}"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -37,15 +81,102 @@ jobs:
           chmod +x build.sh
           ./build.sh
 
+      - name: Name APK for release
+        run: |
+          cp FNF-Porter-For-Mobile.apk "${{ steps.meta.outputs.apk_name }}"
+          ls -lh FNF-Porter-For-Mobile.apk "${{ steps.meta.outputs.apk_name }}"
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: FNF-Porter-For-Mobile
-          path: FNF-Porter-For-Mobile.apk
+          path: |
+            FNF-Porter-For-Mobile.apk
+            ${{ steps.meta.outputs.apk_name }}
+          if-no-files-found: error
 
-      - name: Attach APK to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+  release:
+    name: Releaser
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          files: FNF-Porter-For-Mobile.apk
-          generate_release_notes: true
+          fetch-depth: 0
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: FNF-Porter-For-Mobile
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.build.outputs.tag }}
+          VERSION: ${{ needs.build.outputs.version }}
+          VERSION_CODE: ${{ needs.build.outputs.version_code }}
+          APK_NAME: ${{ needs.build.outputs.apk_name }}
+          PRERELEASE: ${{ github.event.inputs.prerelease || 'false' }}
+        run: |
+          set -euo pipefail
+
+          test -f "$APK_NAME" || { echo "missing $APK_NAME"; ls -la; exit 1; }
+
+          PRE_FLAG=()
+          LATEST_FLAG=(--latest)
+          if [ "$PRERELEASE" = "true" ]; then
+            PRE_FLAG=(--prerelease)
+            LATEST_FLAG=()
+          fi
+
+          NOTES="$(mktemp)"
+          cat > "$NOTES" <<EOF
+          ## FNF Porter For Mobile ${TAG}
+
+          Psych Engine ↔ V-Slice / Base Game porter for Android.
+
+          | | |
+          |---|---|
+          | **App version** | ${VERSION} (versionCode ${VERSION_CODE}) |
+          | **Package** | \`com.sametgkte.fnfporter\` |
+          | **Min Android** | 7.0 (API 24) |
+          | **Funkin api_version** | 0.8.5 |
+
+          ### Install
+          1. Download \`${APK_NAME}\`
+          2. Allow install from unknown sources
+          3. Grant **All files access**
+          4. Pick folders with **Files** → **Use this folder**
+
+          Script conversion is best-effort. Review generated \`.lua\` / \`.hxc\` files.
+
+          ### Credits
+          - **Original FNF Porter:** Gusborg, tposejank, BombasticTom & VocalFan ([Porter.py](https://github.com/FNF-Porter/Porter.py), CC BY-NC 4.0)
+          - **Android:** SametGkTe
+          - Android Ported By GkTe's Archive Tool 2.5.21
+          EOF
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Updating existing release ${TAG}"
+            gh release upload "$TAG" "$APK_NAME" FNF-Porter-For-Mobile.apk --clobber
+            gh release edit "$TAG" \
+              --title "FNF Porter For Mobile ${TAG}" \
+              --notes-file "$NOTES" \
+              --target "${{ github.sha }}" \
+              "${PRE_FLAG[@]}" \
+              "${LATEST_FLAG[@]}"
+          else
+            echo "Creating release ${TAG}"
+            gh release create "$TAG" "$APK_NAME" FNF-Porter-For-Mobile.apk \
+              --title "FNF Porter For Mobile ${TAG}" \
+              --notes-file "$NOTES" \
+              --generate-notes \
+              --target "${{ github.sha }}" \
+              "${PRE_FLAG[@]}" \
+              "${LATEST_FLAG[@]}"
+          fi
+
+          echo "Published ${TAG} → ${APK_NAME}"
+          gh release view "$TAG"
