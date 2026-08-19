@@ -1,45 +1,73 @@
-![Window icon](images/big-icon.webp)
-# Friday Night Funkin' Mod Porter
+# FNF Porter For Mobile
 
-Ports FNF mods between engines using Python. Right now, there's only support for Psych Engine to the Base Game, but new modes are coming soon! It has a GUI, cross-platform support, and logs (check the `logs` folder).
+Android port of [FNF Porter](https://github.com/FNF-Porter/Porter.py) (Psych Engine ↔ V-Slice / Base Game).
 
-## Download
-Go to the [releases tab](https://github.com/gusborg88/fnf-porter/releases) for slightly older versions. Read the dependencies section if you want to build it yourself.
+**Package:** `com.sametgkte.fnfporter`  
+**Min Android:** 7.0 (API 24)
 
-For an alternative stable source, use our [GameBanana](https://gamebanana.com/tools/16982)
+## Credits
 
-For latest builds, go to the [actions tab](https://github.com/gusborg88/fnf-porter/actions)
+### Original FNF Porter
+- **Gusborg**
+- **tposejank**
+- **BombasticTom**
+- **VocalFan**
 
-## Issues?
-Report it in the [issues tab](https://github.com/gusborg88/fnf-porter/issues/).
+Source: [FNF-Porter/Porter.py](https://github.com/FNF-Porter/Porter.py)  
+License: [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
 
-Check if it **already exists** before reporting though!
+### Reverse porter & extra tools
+- **SametGkTe** (GkTe Tool / Uktimate FNF Tool)
 
-Also, logs are saved to your logs folder, so make sure to read them.
+### Android app
+- **SametGkTe**
 
-## Contributing
-Thanks for contributing! You'll need to install [Python](https://www.python.org/downloads/) ofc, and the other dependencies listed in the next section. You can build after this by running [`build.bat`](build.bat). If you have questions about the code, ask the team.
+This project is a non-commercial derivative. You must credit the original authors. You may not sell it.
 
-## Dependencies
-You can simply run `dependency-install.bat` to install all of these at once. You have to go to [python.org](https://www.python.org/downloads/) and get Python first, though.
-- `luaparser`
-- `numpy`
-- `pillow`
-- `pydub`
-- `pyinstaller`
-- `PyQt6`
+## Features
 
-You can start the window by running `psychtobase/main.py`,
-or alternatively run `build.bat` to build the application yourself.
+- `_polymod_meta.json` `api_version` is **0.8.5** (current Funkin)
+- Psych Engine → V-Slice (charts, characters, weeks, stages, audio, images, Lua → HScript)
+- V-Slice → Psych Engine (charts, characters, weeks, stages, audio, images, HScript → Lua)
+- System Files picker (Use this folder)
+- Folder type check (Psych vs V-Slice)
 
-Note that your build won't be signed, so Windows Defender will probably delete it. Github actions make builds that don't have this issue, so use those instead.
+Script conversion is best-effort. Review generated `.lua` / `.hxc` files.
 
-## License
-FNF Porter is licensed under CC-BY-NC 4.0. That means you can modify it, but you have to credit the authors (Gusborg, tposejank, BombasticTom & VocalFan), and you can't make ANY money from it. Because this doesn't use any assets from Funkin' Crew, their license doesn't apply here.
+## Build
 
-Read [LICENSE](LICENSE) for fancy legal words
+Needs JDK 11+ (17 recommended) and Android SDK (`platforms;android-34`, `build-tools;34.0.0`).
 
-This program uses FFmpeg, a free software made for manipulating all sorts of media through codecs.
-FFmpeg is protected under the LGPL v2.1 License.
+```bash
+export ANDROID_HOME=/path/to/Android/Sdk
+export JAVA_HOME=/path/to/jdk
+chmod +x build.sh
+./build.sh
+```
 
-Read [FFmpeg's license](FFMPEG-LICENSE)
+Or push to GitHub — **Actions → Build APK** produces `FNF-Porter-For-Mobile.apk`.
+
+Tag a release to attach the APK automatically:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+## Issues
+
+Use [Issues](https://github.com/SametGkTe/FNF-Porter-Mobile/issues) with a template:
+
+- **Script Error** — Lua / HScript conversion
+- **Conversion Error** — crash while converting
+- **Incomplete conversion** — missing or wrong files
+- **Feature request**
+
+The app **Create an issue** button copies the log and opens the template chooser.
+
+## Install
+
+1. Download the APK from [Releases](../../releases).
+2. Allow install from unknown sources.
+3. Grant **All files access**.
+4. Pick folders with **Files** → **Use this folder**.

@@ -1,0 +1,62 @@
+name: Script Error
+description: HScript / Lua conversion failed or the converted script does not run
+title: "[SCRIPT]: "
+labels: ["script", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste the log from the app (**Create an issue** copies it automatically).
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Conversion direction
+      options:
+        - Psych Lua → V-Slice HScript (.hxc)
+        - V-Slice HScript (.hx / .hxc) → Psych Lua
+    validations:
+      required: true
+  - type: input
+    id: filename
+    attributes:
+      label: Script file name
+      placeholder: GfSingNote.hxc
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Script type
+      options:
+        - ScriptedNoteKind
+        - Song / PlayState script
+        - Stage script
+        - Event / module
+        - Other / unknown
+  - type: textarea
+    id: log
+    attributes:
+      label: App log (paste here)
+      description: Tap Create an issue in the app, then paste.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: snippet
+    attributes:
+      label: Original script snippet (if you can share it)
+      render: text
+  - type: textarea
+    id: extra
+    attributes:
+      label: What went wrong?
+      placeholder: Crash in-game, missing function, empty output...
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Checklist
+      options:
+        - label: I understand script conversion is best-effort and not 100%
+        - label: I searched existing issues first
+          required: true

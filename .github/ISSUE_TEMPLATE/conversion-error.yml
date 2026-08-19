@@ -1,7 +1,7 @@
-name: Incomplete conversion
-description: Files are missing or wrong after convert (and the converter is supposed to handle them)
-title: "[INCOMPLETE]: "
-labels: ["incomplete"]
+name: Conversion Error
+description: Crash or error while converting a mod on Android
+title: "[ERROR]: "
+labels: ["bug"]
 body:
   - type: dropdown
     id: mode
@@ -15,7 +15,7 @@ body:
   - type: dropdown
     id: preset
     attributes:
-      label: Preset
+      label: Preset / options
       options:
         - Full Mod
         - Only Charts
@@ -26,21 +26,34 @@ body:
     validations:
       required: true
   - type: textarea
-    id: missing
+    id: custom
     attributes:
-      label: What is missing or wrong?
-    validations:
-      required: true
+      label: If Custom, which options were on?
+  - type: input
+    id: android
+    attributes:
+      label: Android version / device
+      placeholder: Android 14, Pixel 7
   - type: textarea
     id: log
     attributes:
       label: App log (paste here)
+      description: Use Create an issue in the app to copy the log.
       render: text
+    validations:
+      required: true
+  - type: textarea
+    id: folder
+    attributes:
+      label: What is in the mod folder? (top-level names)
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
   - type: checkboxes
     attributes:
       label: Checklist
       options:
-        - label: I checked the original folder still has these files
-        - label: I checked the converter option for them was enabled
+        - label: I granted All files access
         - label: I searched existing issues first
           required: true

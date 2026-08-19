@@ -1,0 +1,27 @@
+name: Feature request
+description: Ask for a new conversion or app feature
+title: "[REQUEST]: "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - File conversion
+        - Script conversion (Lua / HScript)
+        - Asset copying
+        - Android UI / Files picker
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should it do?
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra context

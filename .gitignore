@@ -1,29 +1,10 @@
-## Folders
-## For all pycache
-**/__pycache__/
-
-# Testing, logs etc
-**/output/*
-**/log_*.txt
-**/mods/*
-
-## Debug mods
-Weekend1/
-vs-skippa-psychengine/
-
-## Files
-## Basically doesn't include any file starting with "test-"
-test-*.py
-CodeTest.py
-fnf-porter.code-workspace
-Thumbs.db
-fnf-porter.bat
-pppppppp.txt
-fnf-porter.log
-
-## PyInstaller
-export/
-
-## FNF Porter files
-**/logs/*
-.defaults
+build/
+*.apk
+!FNF-Porter-For-Mobile.apk
+debug.keystore
+.idea/
+*.iml
+local.properties
+.DS_Store
+__pycache__/
+*.class
