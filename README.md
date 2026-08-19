@@ -1,3 +1,5 @@
+![icon](images/big-icon.webp)
+
 # FNF Porter For Mobile
 
 Android port of [FNF Porter](https://github.com/FNF-Porter/Porter.py) (Psych Engine ↔ V-Slice / Base Game).
@@ -17,7 +19,7 @@ Source: [FNF-Porter/Porter.py](https://github.com/FNF-Porter/Porter.py)
 License: [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
 
 ### Reverse porter & extra tools
-- **SametGkTe** (GkTe Tool / Uktimate FNF Tool)
+- **SametGkTe** (GkTe Tool / GkTe Archive Tool)
 
 ### Android app
 - **SametGkTe**
@@ -29,13 +31,11 @@ This project is a non-commercial derivative. You must credit the original author
 - `_polymod_meta.json` `api_version` is **0.8.5** (current Funkin)
 - Psych Engine → V-Slice (charts, characters, weeks, stages, audio, images, Lua → HScript)
 - V-Slice → Psych Engine (charts, characters, weeks, stages, audio, images, HScript → Lua)
-- System Files picker (Use this folder)
 - Folder type check (Psych vs V-Slice)
 
 Script conversion is best-effort. Review generated `.lua` / `.hxc` files.
 
 ## Build
-
 Needs JDK 11+ (17 recommended) and Android SDK (`platforms;android-34`, `build-tools;34.0.0`).
 
 ```bash
